@@ -25,5 +25,5 @@ schools = CSV.parse(gias_csv, headers: true, encoding: 'ISO-8859-1:UTF-8').map.w
   arr << school
 end
 
-schools.each { |s| write_json(s[:urn], s) }
+schools.each { |s| write_json(%(schools/#{s[:urn]}), s) }
 write_json('schools', schools)
