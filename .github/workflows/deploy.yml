@@ -22,6 +22,9 @@ jobs:
         with:
           ruby-version: 3.3.0
 
+      - name: Install gems
+        run: bundle install
+
       - name: Build
         run: ruby build.rb
 
