@@ -1,7 +1,6 @@
 require 'csv'
 require 'date'
 require 'json'
-require 'net/http'
 require 'open-uri'
 require 'breasal'
 
@@ -19,15 +18,51 @@ def easting_northing_to_wgs84(easting:, northing:)
   Breasal::EastingNorthing.new(easting:, northing:, type: :gb).to_wgs84
 end
 
+def extract_date(date)
+  return nil if date == ""
+
+  Date.parse(date)
+end
+
+def extract_number(num)
+  return nil if num == ""
+
+  num.to_i
+end
+
 schools = CSV.parse(gias_csv, headers: true, encoding: 'ISO-8859-1:UTF-8').map.with_object([]) do |r, arr|
   arr << {
     urn: r['URN'].to_i,
+    ukprn: r['UKPRN'].to_i,
     name: r['EstablishmentName'],
+    local_authority_code: r['LA (code)'],
     local_authority: r['LA (name)'],
+    administritive_district_code: r['DistrictAdministrative (code)'],
+    administritive_district: r['DistrictAdministrative (name)'],
+    phase_of_education_code: extract_number(r['PhaseOfEducation (code)']),
     phase_of_education: r['PhaseOfEducation (name)'],
     gender: r['Gender (name)'],
+    type_code: extract_number(r['TypeOfEstablishment (code)']),
+    type: r['TypeOfEstablishment (name)'],
+    status_code: extract_number(r['EstablishmentStatus (code)']),
     status: r['EstablishmentStatus (name)'],
-    **easting_northing_to_wgs84(easting: r["Easting"].to_f, northing: r["Northing"].to_f)
+
+    rsc_region: r['RSCRegion'],
+    section_41_approved: r['Section41Approved (name)'],
+
+    open_date: extract_date(r['OpenDate']),
+    close_date: extract_date(r['CloseDate']),
+
+    address_1: r['Street'],
+    address_2: r['Locality'],
+    address_3: r['Address3'],
+    county: r['County (name)'],
+    postcode: r['Postcode'],
+
+    school_website: r['SchoolWebsite'],
+
+    phone: r['TelephoneNum'],
+    **easting_northing_to_wgs84(easting: r["Easting"].to_i, northing: r["Northing"].to_i)
   }
 end
 
