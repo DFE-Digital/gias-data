@@ -2,7 +2,7 @@ name: Build
 on:
   push:
   schedule:
-    - cron: "* 5 * * *"
+    - cron: "0 5 * * *"
 
 permissions:
   contents: read
